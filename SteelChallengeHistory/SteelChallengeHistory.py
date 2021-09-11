@@ -7,8 +7,8 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
 
-#uspsa = 'TY106435' #bridget
-uspsa = 'TY110637' # nicholas
+# Put USPSA Number here
+uspsa = '' 
 
 url = 'http://scsa.org/classification/'+uspsa+'/all'
 print(url)
