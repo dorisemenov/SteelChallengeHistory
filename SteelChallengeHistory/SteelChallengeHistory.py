@@ -6,6 +6,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from matplotlib.dates import YearLocator, MonthLocator, DateFormatter
+import math
 
 # Put USPSA Number here
 uspsa = '' 
@@ -17,12 +18,9 @@ with requests.Session() as s:
   index_page= s.get(url)
   soup = BeautifulSoup(index_page.text, 'html.parser')
   
-  data=[]
-  
+  data=[]  
   div = ''
-
   i = 0
-
   for table in soup.find_all(id='ClassifiersTable'):
       table_rows = table.find_all('tr')
       for tr in table_rows:
@@ -39,10 +37,9 @@ with requests.Session() as s:
             # remove last column which just has an image showing it was used in classification
             cells.pop(5)
             cells.insert(0, div)
-            #print(cells)
             cells.append(i)
             data.append(cells)
-            print(cells)
+            #print(cells)
 
 # 0 division
 # 1 event
@@ -71,14 +68,21 @@ mindt = df['date'].min()
 maxdt = df['date'].max()
 
 # Next step is to break up the data by division and graph
-#print(df.sample())
+#print(df.sample(5))
 table = pd.pivot_table(df, values='time', index=['date','stage'], columns=['division'])
 
 #print(table.sample(n=5))
 numfigs = len(table.columns)
 
 print('Number of figures to create: '+str(numfigs))
-fig, ax = plt.subplots(numfigs)
+numrows = math.ceil(numfigs/2)
+fig, ax = plt.subplots(numrows, 2)
+#, sharex=True
+ax = ax.flatten()
+
+# If # of Divisions are Odd, then hide/remove the last plot
+if (numfigs % 2) != 0:  
+  ax[numrows*2-1].set_visible(False)
 
 i = 0
 
@@ -89,7 +93,7 @@ for col in (table.columns):
   divtbl = pd.pivot_table(table, values=col, index='date', columns=['stage'])
   #plt.title(col)
   
-  ax[i] = plt.subplot(numfigs, 2, i+1)
+  ax[i] = plt.subplot(numrows, 2, i+1)
   ax[i].set_title(col)
 
   # Year Ticks
@@ -114,6 +118,7 @@ for col in (table.columns):
 
   plt.plot(divtbl, label=divtbl.columns.values)
   i = i+1
+
 
 #print('Number of Divisions: ' + str(i))
 plt.subplots_adjust(wspace=0.2, 
