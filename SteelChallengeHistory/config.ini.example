@@ -1,0 +1,4 @@
+; config.ini
+[DEFAULT]
+DB_USER = username
+DB_USERPWD = userpassword
